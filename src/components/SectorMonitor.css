@@ -1,0 +1,195 @@
+.sector-container {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  position: relative;
+}
+
+.sector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.sector-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text-main);
+  letter-spacing: 0.01em;
+}
+
+/* Visualization Area */
+.visualization {
+  position: relative;
+  height: 240px;
+  background: #0d0d0d;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.node-grid { top: 30px; left: 30px; }
+.node-gen { bottom: 30px; left: 30px; }
+.node-load { top: 50%; right: 30px; transform: translateY(-50%); }
+
+.icon-box {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #18181b;
+  border: 1px solid var(--border-color);
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.realistic-icon {
+  width: 140%;
+  height: 140%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  transition: opacity 0.3s ease;
+}
+
+.node-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Status variants for minimalist nodes */
+.node.active .icon-box {
+  border-color: var(--color-green);
+  background: rgba(16, 185, 129, 0.05);
+}
+.node.active .node-label { color: var(--color-green); }
+.node.active .realistic-icon { opacity: 1; filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.3)); }
+
+.node.error .icon-box {
+  border-color: var(--color-red);
+  background: rgba(244, 63, 94, 0.05);
+}
+.node.error .node-label { color: var(--color-red); }
+.node.error .realistic-icon { opacity: 0.5; filter: grayscale(1); }
+
+.node.gen-active .icon-box {
+  border-color: var(--color-orange);
+  background: rgba(251, 191, 36, 0.05);
+}
+.node.gen-active .node-label { color: var(--color-orange); }
+.node.gen-active .realistic-icon { opacity: 1; filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.3)); }
+
+.node.idle .realistic-icon { opacity: 0.3; filter: grayscale(1); }
+
+/* Animations for active states */
+@keyframes pulseImg { 
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.gen-active .icon-box .realistic-icon { animation: pulseImg 2s ease-in-out infinite; }
+
+/* Connecting Lines */
+.power-lines {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.power-line {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 1.5;
+  transition: stroke 0.3s ease;
+}
+
+.flow-active-grid {
+  stroke: var(--color-green);
+  stroke-dasharray: 4, 4;
+  animation: flowLine 1.5s linear infinite;
+}
+
+.flow-active-gen {
+  stroke: var(--color-orange);
+  stroke-dasharray: 4, 4;
+  animation: flowLine 1.5s linear infinite;
+}
+
+@keyframes flowLine {
+  to { stroke-dashoffset: -16; }
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: 1.5rem;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--border-color);
+  transition: .3s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #a1a1aa;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider { background-color: rgba(255,255,255,0.1); border: 1px solid var(--border-color); }
+input:checked + .slider:before { transform: translateX(16px); background-color: var(--text-main); }

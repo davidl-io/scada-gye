@@ -1,0 +1,144 @@
+.app-container {
+  width: 100vw;
+  min-height: 100vh;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  font-weight: 300;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .dashboard {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.log-panel {
+  width: 100%;
+  height: 260px;
+  margin-top: 1rem;
+}
+/* Common UI Elements */
+.badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+}
+
+.badge.status-ok {
+  color: var(--color-green);
+  border-color: rgba(16, 185, 129, 0.3);
+  background: transparent;
+}
+
+.badge.status-warning {
+  color: var(--color-orange);
+  border-color: rgba(251, 191, 36, 0.3);
+  background: transparent;
+}
+
+.badge.status-critical {
+  color: var(--color-red);
+  border-color: rgba(244, 63, 94, 0.5);
+  background: transparent;
+  animation: pulse-border-red 2s infinite;
+}
+
+@keyframes pulse-border-red {
+  0% { border-color: rgba(244, 63, 94, 0.2); }
+  50% { border-color: rgba(244, 63, 94, 1); }
+  100% { border-color: rgba(244, 63, 94, 0.2); }
+}
+
+.mqtt-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid transparent;
+}
+
+.mqtt-connected {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.mqtt-connected .mqtt-dot {
+  background-color: var(--color-green);
+  box-shadow: 0 0 8px var(--color-green);
+}
+
+.mqtt-connected span {
+  color: var(--color-green);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.mqtt-disconnected {
+  border-color: rgba(244, 63, 94, 0.3);
+}
+
+.mqtt-disconnected .mqtt-dot {
+  background-color: var(--color-red);
+  box-shadow: 0 0 8px var(--color-red);
+  animation: blink 1.5s infinite;
+}
+
+.mqtt-disconnected span {
+  color: var(--color-red);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.mqtt-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
