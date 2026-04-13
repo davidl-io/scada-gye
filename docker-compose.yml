@@ -1,0 +1,16 @@
+
+services:
+  scada-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: scada-aijjo:latest
+    container_name: scada-aijjo-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MQTT_BROKER_URL=mqtt://172.28.2.20:1883
+      - MQTT_USERNAME=tagsa
+      - MQTT_PASSWORD=NXS
+    restart: unless-stopped

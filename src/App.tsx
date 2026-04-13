@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+
 import './App.css';
 import { SectorMonitor } from './components/SectorMonitor';
 import { EventLog } from './components/EventLog';
 import type { ScadaEvent } from './components/EventLog';
 
-// Dynamically connect to the local Vite proxy or the same-domain production server
-const socketURL = import.meta.env.DEV ? 'http://localhost:3001' : '/';
-const socket = io(socketURL);
+import { socket } from './socket';
 
 function App() {
   const [mqttStatus, setMqttStatus] = useState<boolean | null>(null);

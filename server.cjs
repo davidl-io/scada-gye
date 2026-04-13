@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // Fallback universal para SPA de React
-app.get('*', (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
@@ -25,11 +25,11 @@ const io = new Server(server, {
 });
 
 // Configuración MQTT a The Things Network / Chirpstack (IP LAN local del Aeropuerto)
-const MQTT_BROKER_URL = 'mqtt://172.28.2.20:1883';
+const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL || 'mqtt://172.28.2.20:1883';
 const MQTT_OPTIONS = {
-  username: 'tagsa',
-  password: 'NXS',
-  clientId: `scada_web_${Math.random().toString(16).slice(3)}`
+  username: process.env.MQTT_USERNAME || 'tagsa',
+  password: process.env.MQTT_PASSWORD || 'NXS',
+  clientId: process.env.MQTT_CLIENT_ID || `scada_web_${Math.random().toString(16).slice(3)}`
 };
 
 const mqttClient = mqtt.connect(MQTT_BROKER_URL, MQTT_OPTIONS);
@@ -37,7 +37,7 @@ const mqttClient = mqtt.connect(MQTT_BROKER_URL, MQTT_OPTIONS);
 let isMqttConnected = false;
 
 mqttClient.on('connect', () => {
-  console.log('[MQTT] Conectado exitosamente al broker en 172.28.2.20');
+  console.log(`[MQTT] Conectado exitosamente al broker en ${MQTT_BROKER_URL}`);
   isMqttConnected = true;
   io.emit('mqtt_status', { connected: true });
   
@@ -102,7 +102,7 @@ io.on('connection', (socket) => {
   socket.emit('mqtt_status', { connected: isMqttConnected });
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`[Servidor] MQTT Proxy ejecutándose en http://localhost:${PORT}`);
 });

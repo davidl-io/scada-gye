@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
+
 import './SectorMonitor.css';
 
-// Initialize global connection
-const socket = io('http://localhost:3001');
+import { socket } from '../socket';
 
 interface SectorMonitorProps {
   name: string;
