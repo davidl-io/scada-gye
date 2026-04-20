@@ -59,6 +59,7 @@ function App() {
           <SectorMonitor 
             name="Sector Glide Slope" 
             loadIconSrc="/glide_slope.png" 
+            deviceId="controlador-glide"
             onLogEvent={(t, m) => addEvent('Glide Slope', t, m)}
           />
         </div>
