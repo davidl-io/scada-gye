@@ -14,7 +14,9 @@ interface SectorMonitorProps {
 export const SectorMonitor: React.FC<SectorMonitorProps> = ({ name, loadIconSrc, deviceId, onLogEvent }) => {
   const [gridPower, setGridPower] = useState(true);
   const [loadPower, setLoadPower] = useState(true);
-  const [isLive, setIsLive] = useState(false);
+  const [, setIsLive] = useState(false);
+  const [, setLastMessageTime] = useState<number>(Date.now());
+  const [isCommLost, setIsCommLost] = useState(true);
 
   useEffect(() => {
     if (!deviceId) return;
@@ -23,15 +25,39 @@ export const SectorMonitor: React.FC<SectorMonitorProps> = ({ name, loadIconSrc,
       if (data.deviceId === deviceId) {
         setGridPower(data.gridPower);
         setLoadPower(data.loadPower);
+        setLastMessageTime(Date.now());
         setIsLive(true);
+        if (isCommLost) {
+          setIsCommLost(false);
+          onLogEvent?.('ok', 'Comunicación restablecida');
+        }
       }
     };
 
     socket.on('device_status', handleDeviceStatus);
     
+    // Timer to check communication status
+    const commTimer = setInterval(() => {
+      setLastMessageTime(prevTime => {
+        if (prevTime !== null && Date.now() - prevTime > 120000) {
+          setIsCommLost(curr => {
+            if (!curr) {
+              onLogEvent?.('warning', 'Pérdida de Comunicación (MQTT intermitente/desconectado > 2min)');
+              return true;
+            }
+            return curr;
+          });
+        }
+        return prevTime;
+      });
+    }, 5000);
+
     // Cleanup Listener
-    return () => { socket.off('device_status', handleDeviceStatus); };
-  }, [deviceId]);
+    return () => { 
+      socket.off('device_status', handleDeviceStatus);
+      clearInterval(commTimer);
+    };
+  }, [deviceId, isCommLost, onLogEvent]);
 
   // Track state transitions to emit logs
   const prevGrid = useRef(gridPower);
@@ -54,7 +80,10 @@ export const SectorMonitor: React.FC<SectorMonitorProps> = ({ name, loadIconSrc,
   let statusText = "";
   let statusClass = "";
 
-  if (gridPower && loadPower) {
+  if (isCommLost) {
+    statusText = "ESPERANDO CONEXIÓN...";
+    statusClass = "status-warning";
+  } else if (gridPower && loadPower) {
     statusText = "NORMAL (RED PÚBLICA CNEL)";
     statusClass = "status-ok";
   } else if (!gridPower && loadPower) {
@@ -79,6 +108,32 @@ export const SectorMonitor: React.FC<SectorMonitorProps> = ({ name, loadIconSrc,
       </div>
 
       <div className="visualization">
+        {isCommLost && (
+          <div className="visualization-overlay">
+            <div className="overlay-content blink-orange">
+              <span className="overlay-icon">⚠️</span>
+              <span className="overlay-text">Precaución: Sin Comunicación</span>
+            </div>
+          </div>
+        )}
+        
+        {!isCommLost && (!gridPower && !loadPower) && (
+          <div className="visualization-overlay">
+            <div className="overlay-content blink-red">
+              <span className="overlay-icon">🚨</span>
+              <span className="overlay-text">Falla de Generador</span>
+            </div>
+          </div>
+        )}
+
+        {!isCommLost && (gridPower && !loadPower) && (
+          <div className="visualization-overlay">
+            <div className="overlay-content blink-red">
+              <span className="overlay-icon">🚨</span>
+              <span className="overlay-text">Falla de Carga</span>
+            </div>
+          </div>
+        )}
         <svg className="power-lines" width="100%" height="100%">
           <line 
             x1="60" y1="52" x2="88%" y2="50%"
@@ -100,29 +155,9 @@ export const SectorMonitor: React.FC<SectorMonitorProps> = ({ name, loadIconSrc,
           <span className="node-label">Generador CAT C32</span>
         </div>
 
-        <div className={`node node-load ${loadPower ? (gridActive ? 'active' : 'gen-active') : 'error'}`}>
+        <div className={`node node-load ${loadPower && !isCommLost ? (gridActive ? 'active' : 'gen-active') : 'error'}`}>
           <div className="icon-box"><img src={loadIconSrc} className="realistic-icon" alt="Carga" /></div>
           <span className="node-label">Carga</span>
-        </div>
-      </div>
-
-      <div className="controls">
-        <span className="node-label" style={{ marginRight: 'auto', display: 'flex', alignItems: 'center' }}>
-          {isLive ? `DATOS EN VIVO MQTT (${deviceId})` : "Simulador Manual Dragino"}
-        </span>
-        <div className="control-group">
-          <label className="toggle-switch">
-            <input type="checkbox" checked={gridPower} disabled={isLive} onChange={(e) => setGridPower(e.target.checked)} />
-            <span className="slider"></span>
-          </label>
-          <span className="node-label">IN1</span>
-        </div>
-        <div className="control-group">
-          <label className="toggle-switch">
-            <input type="checkbox" checked={loadPower} disabled={isLive} onChange={(e) => setLoadPower(e.target.checked)} />
-            <span className="slider"></span>
-          </label>
-          <span className="node-label">IN2</span>
         </div>
       </div>
     </div>

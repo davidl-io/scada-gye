@@ -10,7 +10,32 @@ services:
       - "3001:3001"
     environment:
       - PORT=3001
-      - MQTT_BROKER_URL=mqtt://broker.hivemq.com:1883
+      - MQTT_BROKER_URL=mqtt://172.28.2.20:1883
       - MQTT_USERNAME=
       - MQTT_PASSWORD=
+      - MONGO_URL=mongodb://mongodb:27017
     restart: unless-stopped
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    container_name: scada-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - scada_mongo_data:/data/db
+    restart: unless-stopped
+
+  opcua-backend:
+    build:
+      context: ./opcua_backend
+      dockerfile: Dockerfile
+    image: scada-opcua:latest
+    container_name: scada-opcua-service
+    ports:
+      - "4840:4840"
+    restart: unless-stopped
+
+volumes:
+  scada_mongo_data:

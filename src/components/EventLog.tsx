@@ -16,10 +16,10 @@ interface EventLogProps {
 export const EventLog: React.FC<EventLogProps> = ({ events }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom on new event
+  // Auto-scroll to top on new event
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = 0;
     }
   }, [events]);
 
@@ -32,7 +32,7 @@ export const EventLog: React.FC<EventLogProps> = ({ events }) => {
         {events.length === 0 ? (
           <div className="event-empty">Sin eventos registrados</div>
         ) : (
-          events.map(ev => (
+          [...events].reverse().map(ev => (
             <div key={ev.id} className={`event-item type-${ev.type}`}>
               <div className="event-meta">
                 <span className="event-time">{ev.time.toLocaleTimeString()}</span>
